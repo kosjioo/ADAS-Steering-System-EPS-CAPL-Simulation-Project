@@ -1,0 +1,92 @@
+一、CANoe 是什么？
+CANoe 是德国 Vector 公司开发的一款功能强大的车载汽车网络仿真和测试平台。它支持多种总线协议（如 CAN、LIN、Ethernet、FlexRay 等），
+用于：
+
+- ECU（电子控制单元）开发和测试
+- 网络仿真、诊断、数据记录
+- 与实际车辆通信或完全虚拟仿真
+
+
+
+二、CAPL 脚本语言
+CAPL（CAN Access Programming Language）是 CANoe 内部使用的编程语言，用于模拟 ECU 行为
+是CANoe 内嵌的专用编程语言，类似于 C 语言，专门用于：
+
+- 响应总线事件（如 CAN 报文、诊断请求等）
+- 模拟 ECU 行为
+- 执行测试逻辑
+
+ 举个例子：
+
+capl
+on message EngineData
+{
+  if (this.RPM > 3000)
+  output("Engine RPM too high!");
+}
+
+三、Panel（面板）
+Panel 是 CAPL 的图形界面交互工具，可以展示按钮、表格...
+可以创建：
+
+按钮（Button）
+
+滑块（Slider）
+
+仪表盘（Gauge）
+
+显示文字、图表
+
+这些面板通常用于测试人员操作，比如点击按钮触发信号或读取实时值。
+
+
+
+四、Sysvar（系统变量）（##桥梁）
+Sysvar 是 CANoe 中用于面板与 CAPL 交互的数据桥梁.
+作用是：
+
+Panel→ Sysvar → CAPL（用户点击按钮改变变量，CAPL 获取）
+
+CAPL → Sysvar → 面板（CAPL 脚本更新变量，面板实时显示）
+
+🪝 简单理解：Sysvar = “共享变量池”
+
+variables
+{
+  sysvar float VehicleSpeed;
+}
+
+on start
+{
+  VehicleSpeed = 80.0;     // CAPL 设置，面板显示
+}
+
+
+
+## 总结关系图
+
+         +--------------+
+          |    CANoe     |   ← 仿真与测试平台
+         +--------------+
+                   ↓
+                   
+         +--------------+
+          |       CAPL      |    ← 控制逻辑和脚本
+         +--------------+
+             
+	         ↑
+      (通过 Sysvar 共享数据)
+                   ↓
+
++----------------------+            +----------------------+
+ |       Panel GUI          | <--→    |            Sysvar          |
++----------------------+            +----------------------+
+
+
+CANoe 是平台
+
+CAPL 写逻辑
+
+Panel 提供操作界面
+
+Sysvar 让 CAPL 与 Panel 通信
